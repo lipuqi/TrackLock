@@ -58,20 +58,13 @@ typedef struct SaveData
 	char longitude[longitude_Length];		//经度
 	char E_W[E_W_Length];		//E/W
 	char isUsefull;		//定位信息是否有效
+	char isNull;
 } _SaveData;
 
 
 
-
 void USART2_Config(void);
-extern u16 point1;
-extern _SaveData Save_Data;
-
-void CLR_Buf(void);
-u8 Hand(char *a);
 void clrStruct(void);
-
-void parseGpsBuffer(void);
-_SaveData* getGpsBuffer(int n);
+void getGpsBuffer(int n);
 
 #endif

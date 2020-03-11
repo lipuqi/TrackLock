@@ -3,14 +3,6 @@
 char *strx;
 extern char RxCounter,RxBuffer[100];
 
-int getStrlen(char* str)
-{
-	int count = 0;
-	while (*str++)count++;
-
-	return count;
-}
-
 void Clear_Buffer(void)//清空缓存
 {
 		u8 i;
@@ -36,13 +28,24 @@ void BC35_Init(void)
 		
     Usart3_SendString("AT+CSQ\r\n");//可以查询当前的信号值
     delay_ms(300);
-    strx=strstr((const char*)RxBuffer,(const char*)"OK");//返OK
-    Clear_Buffer();	
+    strx=strstr((const char*)RxBuffer,(const char*)"OK");
+    Clear_Buffer();		
 		
 		Usart3_SendString("AT+CFUN=1\r\n"); 
     delay_ms(300);
     strx=strstr((const char*)RxBuffer,(const char*)"OK");//返回OK
     Clear_Buffer();		
+		while(strx==NULL)
+    {
+				delay_ms(600);
+        Usart3_SendString("AT+CSQ\r\n");
+        delay_ms(300);
+        strx=strstr((const char*)RxBuffer,(const char*)"OK");
+				Usart3_SendString("AT+CFUN=1\r\n"); 
+				delay_ms(300);
+				strx=strstr((const char*)RxBuffer,(const char*)"OK");//返回OK
+				Clear_Buffer();	
+    }
 		
     Usart3_SendString("AT+CGATT=1\r\n");//
     delay_ms(300);    
@@ -111,3 +114,49 @@ void BC35_COAPdata(char *data)
     }
     Clear_Buffer(); 
 }
+
+void BC35_Shutdown(void)
+{
+	  Usart3_SendString("AT+QLWULDATAEX=3,AA34BB,0x0001\r\n"); 
+    delay_ms(300);
+    strx=strstr((const char*)RxBuffer,(const char*)"OK");//返回OK
+    Clear_Buffer();	
+    while(strx==NULL)
+    {
+        Clear_Buffer();	
+        Usart3_SendString("AT+QLWULDATAEX=3,AA34BB,0x0001\r\n"); 
+        delay_ms(300);
+        strx=strstr((const char*)RxBuffer,(const char*)"OK");//返回OK
+    }
+		Usart3_SendString("AT+CFUN=0\r\n"); 
+    delay_ms(300);
+    strx=strstr((const char*)RxBuffer,(const char*)"OK");//返回OK
+    Clear_Buffer();	
+    while(strx==NULL)
+    {
+        Clear_Buffer();	
+        Usart3_SendString("AT+CFUN=0\r\n"); 
+        delay_ms(300);
+        strx=strstr((const char*)RxBuffer,(const char*)"OK");//返回OK
+    }
+}
+
+int isCommunication(void)
+{
+	int index = 20;
+	while(index > 0){
+		Usart3_SendString("AT+CSQ\r\n");//可以查询当前的信号值
+		delay_ms(300);
+		strx=strstr((const char*)RxBuffer,(const char*)"+CSQ:99,99");
+		Clear_Buffer();
+		while(strx==NULL)
+		{
+			return 1;
+		}
+		index--;
+		delay_ms(700);
+	}
+	return 0;
+}
+
+

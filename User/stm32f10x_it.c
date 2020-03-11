@@ -136,10 +136,16 @@ void SysTick_Handler(void)
 {
 }
 
+char isUnLock;
 void KEY1_EXIT_IRQHANDLER(void)
 {
 	 if(EXTI_GetITStatus(KEY1_EXIT_LINE) != RESET){
-			
+		 if(!isUnLock){
+		 	reportLockState();
+			TIM_Cmd(TIM4, ENABLE); 
+			isUnLock = 1;
+			LED_ON;
+		 }
 	 }
 	 EXTI_ClearITPendingBit(KEY1_EXIT_LINE);
 }
@@ -188,15 +194,63 @@ void DEBUG_USART_IRQHandler(void)
 	}
 }
 
+char isTim2;
+uint32_t time2 = 0;
 void TIM2_IRQHandler(void)
 {
     
     if(TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)
-    {    
-				reportHeartbeat();
+    {   
+				if(time2 > getPositionInterval()){
+					isTim2 = 1;
+					time2 = 0;
+				} else {
+					time2++;
+				}
+				
     }
     TIM_ClearITPendingBit(TIM2, TIM_FLAG_Update);
 }
+
+char isTim3;
+uint32_t time3 = 0;
+void TIM3_IRQHandler(void)
+{
+    
+    if(TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)
+    {   
+				if(time3 > getStateInterval()){
+					isTim3 = 1;
+					time3 = 0;
+				} else {
+					time3++;
+				}
+				
+    }
+    TIM_ClearITPendingBit(TIM3, TIM_FLAG_Update);
+}
+
+uint32_t time4 = 0;
+void TIM4_IRQHandler(void)
+{
+    
+    if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
+    {   
+				if(time4 > 20){
+					if(isUnLock){
+						isUnLock = 0;
+						LED_OFF;
+					}
+					time4 = 0;
+					TIM_Cmd(TIM4, DISABLE); 
+				} else {
+					time4++;
+				}
+				
+    }
+    TIM_ClearITPendingBit(TIM4, TIM_FLAG_Update);
+}
+
 
 
 

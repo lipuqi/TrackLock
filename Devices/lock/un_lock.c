@@ -1,5 +1,7 @@
 #include "un_lock.h"
 
+char lockStatus = 0;
+
 void Lock_Cfg(void){
 	
 	GPIO_InitTypeDef lock_gpio;
@@ -16,4 +18,19 @@ void Lock_Cfg(void){
 	
 	BELL_OFF;
 	LED_OFF;
+}
+
+void toggleLockStatus(void)
+{
+	BELL_TOGGLE;
+	if(lockStatus){
+		lockStatus = 0;
+	} else {
+		lockStatus = 1;
+	}
+}
+
+char getLockStatus(void)
+{
+	return lockStatus;
 }

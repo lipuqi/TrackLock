@@ -4,9 +4,8 @@ static void NVIC_Cfg(void){
 	
 	NVIC_InitTypeDef NVIC_InitTStruct;
 	
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 	NVIC_InitTStruct.NVIC_IRQChannel = KEY1_EXIT_IRQN;
-	NVIC_InitTStruct.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitTStruct.NVIC_IRQChannelPreemptionPriority = 0;
 	NVIC_InitTStruct.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitTStruct.NVIC_IRQChannelCmd = ENABLE;
 	

@@ -18,5 +18,7 @@
 #define BELL_TOGGLE  			BELL_GPIO_PORT -> ODR ^= BELL_GPIO_PIN
 
 void Lock_Cfg(void);
+void toggleLockStatus(void);
+char getLockStatus(void);
 
 #endif

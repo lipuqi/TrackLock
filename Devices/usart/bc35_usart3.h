@@ -3,8 +3,7 @@
 
 #include "stm32f10x.h"
 #include "bc35_queue.h"
-#include <string.h>
-#include <stdio.h>
+#include "../../System/utils/utils.h"
 	  	
 
 // ´®¿Ú3-USART3

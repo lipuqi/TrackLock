@@ -2,12 +2,37 @@
 
 u16 point1 = 0;
 
-_SaveData Save_Data;
+extern _SaveData Save_Data;
  	
 char USART_RX_BUF[USART_REC_LEN];
 
+void CLR_Buf(void)                           // 串口缓存清理
+{
+	memset(USART_RX_BUF, 0, USART_REC_LEN);      //清空
+  point1 = 0;                    
+}
 
-static void NVIC_Configuration(void)
+void clrStruct()
+{
+	Save_Data.isGetData = false;
+	Save_Data.isParseData = false;
+	Save_Data.isUsefull = false;
+	Save_Data.isNull = true;
+	memset(Save_Data.GPS_Buffer, 0, GPS_Buffer_Length);      //清空
+	memset(Save_Data.UTCTime, 0, UTCTime_Length);
+	memset(Save_Data.latitude, 0, latitude_Length);
+	memset(Save_Data.N_S, 0, N_S_Length);
+	memset(Save_Data.longitude, 0, longitude_Length);
+	memset(Save_Data.E_W, 0, E_W_Length);
+	
+}
+
+void errorLog(int num)
+{
+	
+}
+
+static void GNSS_Configuration(void)
 {
   NVIC_InitTypeDef NVIC_InitStructure;
   
@@ -69,79 +94,8 @@ void USART2_Config(void)
 	USART_Init(GNSS_USART2x, &USART_InitStructure);
 	
 	// 串口中断优先级配置
-	NVIC_Configuration();
+	GNSS_Configuration();
 	
-}
-
-void GNSS_USART2_IRQHandler(void)                	//串口2中断服务程序
-{
-	u8 Res;
-	
-	if(USART_GetITStatus(GNSS_USART2x, USART_IT_RXNE) != RESET) 
-	{
-		Res =USART_ReceiveData(GNSS_USART2x);//(USART1->DR);	//读取接收到的数据
-	if(Res == '$')
-	{
-		point1 = 0;	
-	}
-	  USART_RX_BUF[point1++] = Res;
-	if(USART_RX_BUF[0] == '$' && USART_RX_BUF[4] == 'M' && USART_RX_BUF[5] == 'C')			//确定是否收到"GPRMC/GNRMC"这一帧数据
-	{
-		if(Res == '\n')									   
-		{
-			memset(Save_Data.GPS_Buffer, 0, GPS_Buffer_Length);      //清空
-			memcpy(Save_Data.GPS_Buffer, USART_RX_BUF, point1); 	//保存数据
-			Save_Data.isGetData = true;
-			point1 = 0;
-			memset(USART_RX_BUF, 0, USART_REC_LEN);      //清空				
-		}	
-				
-	}
-	
-	if(point1 >= USART_REC_LEN)
-	{
-		point1 = USART_REC_LEN;
-	}	
-		 		 
-   } 
-}
-
-
-u8 Hand(char *a)                   // 串口命令识别函数
-{ 
-  if(strstr(USART_RX_BUF,a)!=NULL)
-	    return 1;
-	else
-		return 0;
-}
-
-void CLR_Buf(void)                           // 串口缓存清理
-{
-	memset(USART_RX_BUF, 0, USART_REC_LEN);      //清空
-  point1 = 0;                    
-}
-
-void clrStruct()
-{
-	Save_Data.isGetData = false;
-	Save_Data.isParseData = false;
-	Save_Data.isUsefull = false;
-	memset(Save_Data.GPS_Buffer, 0, GPS_Buffer_Length);      //清空
-	memset(Save_Data.UTCTime, 0, UTCTime_Length);
-	memset(Save_Data.latitude, 0, latitude_Length);
-	memset(Save_Data.N_S, 0, N_S_Length);
-	memset(Save_Data.longitude, 0, longitude_Length);
-	memset(Save_Data.E_W, 0, E_W_Length);
-	
-}
-
-void errorLog(int num)
-{
-	
-	while (1)
-	{
-	  	printf("ERROR%d\r\n",num);
-	}
 }
 
 /*****************  发送一个字节 **********************/
@@ -168,6 +122,41 @@ void Usart2_SendString(char *str)
   while(USART_GetFlagStatus(GNSS_USART2x,USART_FLAG_TC)==RESET)
   {}
 }
+
+void GNSS_USART2_IRQHandler(void)                	//串口2中断服务程序
+{
+	u8 Res;
+	
+	if(USART_GetITStatus(GNSS_USART2x, USART_IT_RXNE) != RESET) 
+	{
+		Res =USART_ReceiveData(GNSS_USART2x);//(USART1->DR);	//读取接收到的数据
+	if(Res == '$')
+	{
+		point1 = 0;	
+	}
+	  USART_RX_BUF[point1++] = Res;
+	if(USART_RX_BUF[0] == '$' && USART_RX_BUF[4] == 'M' && USART_RX_BUF[5] == 'C')			//确定是否收到"GPRMC/GNRMC"这一帧数据
+	{
+		if(Res == '\n' && Save_Data.isNull)									   
+		{
+			Usart2_SendString(GNSS_DISABLE);
+			memset(Save_Data.GPS_Buffer, 0, GPS_Buffer_Length);      //清空
+			memcpy(Save_Data.GPS_Buffer, USART_RX_BUF, point1); 	//保存数据
+			Save_Data.isGetData = true;
+			point1 = 0;
+			memset(USART_RX_BUF, 0, USART_REC_LEN);      //清空			
+		}	
+				
+	}
+	
+	if(point1 >= USART_REC_LEN)
+	{
+		point1 = USART_REC_LEN;
+	}	
+		 		 
+   } 
+}
+
 
 void parseGpsBuffer()
 {
@@ -222,7 +211,7 @@ void parseGpsBuffer()
 	}
 }
 
-_SaveData* getGpsBuffer(int n)
+void getGpsBuffer(int n)
 {
 	int index = n;
 		// 使能串口接收中断
@@ -231,11 +220,11 @@ _SaveData* getGpsBuffer(int n)
 	// 使能串口
 	USART_Cmd(GNSS_USART2x, ENABLE);
 	
-	CLR_Buf();//清空缓存
-	clrStruct();
-	
 	Usart2_SendString(GNSS_ENABLE);
 	
+	CLR_Buf();//清空缓存
+	clrStruct();
+		
 	while (index > 0)
 	{
 		parseGpsBuffer();
@@ -244,27 +233,19 @@ _SaveData* getGpsBuffer(int n)
 			Save_Data.isParseData = false;
 				if(Save_Data.isUsefull)
 				{
-						Save_Data.isUsefull = false;
-						
-						Usart2_SendString(GNSS_DISABLE);
-						
-							// 使能串口接收中断
-						USART_ITConfig(GNSS_USART2x, USART_IT_RXNE, DISABLE);	
-		
-						CLR_Buf();//清空缓存
-					
-						return &Save_Data;
-						
+					break;
+				} else {
+					Usart2_SendString(GNSS_ENABLE);
 				}	
 		}	
 		delay_ms(1000);
 		index--;	
 	}	
+	
 	Usart2_SendString(GNSS_DISABLE);			
 	// 使能串口接收中断
 	USART_ITConfig(GNSS_USART2x, USART_IT_RXNE, DISABLE);	
 	CLR_Buf();//清空缓存
-	return NULL;
 }
 
 

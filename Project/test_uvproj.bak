@@ -425,19 +425,9 @@
               <FilePath>..\Devices\led\bsp_led.c</FilePath>
             </File>
             <File>
-              <FileName>led1_9.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Devices\led2\led1_9.c</FilePath>
-            </File>
-            <File>
               <FileName>key1.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Devices\key\key1.c</FilePath>
-            </File>
-            <File>
-              <FileName>bell1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Devices\bell\bell1.c</FilePath>
             </File>
             <File>
               <FileName>common.h</FileName>
@@ -460,11 +450,6 @@
               <FilePath>..\Devices\bc35g\BC35.c</FilePath>
             </File>
             <File>
-              <FileName>BC35.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Devices\bc35g\BC35.h</FilePath>
-            </File>
-            <File>
               <FileName>gnss_usart2.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Devices\usart\gnss_usart2.c</FilePath>
@@ -475,14 +460,19 @@
               <FilePath>..\Devices\usart\bc35_usart3.c</FilePath>
             </File>
             <File>
-              <FileName>bc35_usart3.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\Devices\usart\bc35_usart3.h</FilePath>
-            </File>
-            <File>
               <FileName>common.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Devices\common.c</FilePath>
+            </File>
+            <File>
+              <FileName>bc35_queue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Devices\usart\bc35_queue.c</FilePath>
+            </File>
+            <File>
+              <FileName>un_lock.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Devices\lock\un_lock.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -628,6 +618,16 @@
               <FileName>sys.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\System\sys\sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>TiMbase.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\System\TIM\TiMbase.c</FilePath>
+            </File>
+            <File>
+              <FileName>TiMbase.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\System\TIM\TiMbase.h</FilePath>
             </File>
           </Files>
         </Group>

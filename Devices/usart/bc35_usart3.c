@@ -13,20 +13,6 @@ void Clear_RxBuf(void)//清空缓存
 	
 }
 
-void appendchar(void* source, void* des, int source_len, int des_len)
-{
-	char* pSource = (char*)source;
-	char* pDes = (char*)des;
-	while (source_len != 0)
-	{
-		*((pDes++) + des_len) = *pSource++;
-		source_len--;
-		if (source_len == 0) {
-			*((pDes++) + des_len) = '\0';
-		}
-	}
-}
-
 static void NVIC_Configuration(void)
 {
   NVIC_InitTypeDef NVIC_InitStructure;
@@ -148,6 +134,7 @@ void Usart3_SendString(char *str)
       Usart3_SendByte( BC35_USART3x, *(str + k) );
       k++;
   } while(*(str + k)!='\0');
+	//printf("Usart3_SendString -> %s\r\n", str);
   /* 等待发送完成 */
   while(USART_GetFlagStatus(BC35_USART3x,USART_FLAG_TC)==RESET)
   {}
