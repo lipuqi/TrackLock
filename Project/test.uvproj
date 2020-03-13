@@ -635,9 +635,14 @@
               <FilePath>..\System\utils\utils.c</FilePath>
             </File>
             <File>
-              <FileName>utils.h</FileName>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\System\ADC\adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\System\utils\utils.h</FilePath>
+              <FilePath>..\System\ADC\adc.h</FilePath>
             </File>
           </Files>
         </Group>

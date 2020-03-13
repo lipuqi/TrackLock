@@ -155,7 +155,7 @@ void rand4UUID(char des[5])
 		'O','P','Q','R','S','T','U','V','W','X',
 		'Y','Z'
 	};//Ëæ»ú³Ø
-	srand(1);
+	srand(Get_Adc());
 	des[4] = '\0';
 	int i = 0;
 	while (i != 4)

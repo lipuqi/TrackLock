@@ -46,14 +46,15 @@ typedef struct Instructions
 	char isNull;
 } InstrucData;
 
-void taskScheduler_init(void);
-void taskScheduler(void);
-int reportPosition(char* code);
-int reportLockState(void);
-int reportDeviceState(void);
-int reportHeartbeat(void);
 u16 getHeartbeatInterval(void);
 u16 getStateInterval(void);
 u16 getPositionInterval(void);
+void showBattery(void);
+void taskScheduler_init(void);
+void taskScheduler(void);
+int reportPosition(char* code, char type);
+int reportLockState(char* code);
+int reportDeviceState(void);
+int reportHeartbeat(void);
 
 #endif

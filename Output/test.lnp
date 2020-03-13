@@ -39,6 +39,7 @@
 "..\output\timbase.o"
 "..\output\scheduler.o"
 "..\output\utils.o"
+"..\output\adc.o"
 "..\output\main.o"
 "..\output\stm32f10x_it.o"
 --library_type=microlib --strict --scatter "..\Output\test.sct"

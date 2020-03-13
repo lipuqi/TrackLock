@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+ #include "../ADC/adc.h"
 
 #define u32 unsigned long int
 #define u16 unsigned int

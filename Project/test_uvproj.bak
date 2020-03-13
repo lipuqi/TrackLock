@@ -460,11 +460,6 @@
               <FilePath>..\Devices\usart\bc35_usart3.c</FilePath>
             </File>
             <File>
-              <FileName>common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Devices\common.c</FilePath>
-            </File>
-            <File>
               <FileName>bc35_queue.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Devices\usart\bc35_queue.c</FilePath>
@@ -625,9 +620,24 @@
               <FilePath>..\System\TIM\TiMbase.c</FilePath>
             </File>
             <File>
-              <FileName>TiMbase.h</FileName>
+              <FileName>scheduler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\System\scheduler\scheduler.c</FilePath>
+            </File>
+            <File>
+              <FileName>scheduler.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\System\TIM\TiMbase.h</FilePath>
+              <FilePath>..\System\scheduler\scheduler.h</FilePath>
+            </File>
+            <File>
+              <FileName>utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\System\utils\utils.c</FilePath>
+            </File>
+            <File>
+              <FileName>utils.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\System\utils\utils.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -6,6 +6,7 @@
 #include "../System/delay/delay.h"
 #include "../System/sys/sys.h"
 #include "../System/TIM/TiMbase.h"
+#include "../System/ADC/adc.h"
 
 //#include "./led/bsp_led.h"
 #include "./lock/un_lock.h"

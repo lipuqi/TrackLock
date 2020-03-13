@@ -3,9 +3,11 @@
 InstrucData instruc_data;
 _SaveData Save_Data;
 extern SqQueue struc_queue;
-extern char isUnLock;
+extern char wakeLock;
 char battery;
+extern char lockStatus;
 
+extern char isUnLock;
 extern char isTim2;
 extern char isTim3;
 
@@ -26,6 +28,25 @@ u16 getPositionInterval(void)
 	return positionInterval;
 }
 
+void showBattery(void)
+{
+	if(battery > 70)
+	{
+			LED_ctrl(GREEN,1);
+			delay_ms(500);
+			LED_ctrl(GREEN,0);
+	} else if(battery < 70 && battery > 30)
+	{
+			LED_ctrl(YELLOW,1);
+			delay_ms(500);
+			LED_ctrl(YELLOW,0);
+	} else {
+			LED_ctrl(RED,1);
+			delay_ms(500);
+			LED_ctrl(RED,0);
+	}
+}
+
 void clrInstruc(void)
 {
 	instruc_data.isParseData = false;
@@ -42,8 +63,10 @@ void taskScheduler_init(void)
 {
 	isTim2 = 0;
 	isTim3 = 0;
+	wakeLock = 0;
+	lockStatus = 1;
 	isUnLock = 0;
-	battery = 100;
+	battery = Get_battery();;
 	clrInstruc();
 	InitQueue(&struc_queue);
 }
@@ -62,7 +85,7 @@ void sendResponse(int msgId, char* mid, int errCode, char* data)
 	BC35_COAPdata(res);
 }
 
-int reportPosition(char* code)
+int reportPosition(char* code, char type)
 {
 	getGpsBuffer(positionNum);
 	if (Save_Data.isUsefull)
@@ -77,9 +100,9 @@ int reportPosition(char* code)
 		if(strcmp(code, "0000")){
 			char codeHex[20] = { 0 };
 			charToHex(code, codeHex);
-			sprintf(data, "%s%s%s", result, "00", codeHex);
+			sprintf(data, "%s%02d%s", result, type, codeHex);
 		} else {
-			sprintf(data, "%s%s%s", result, "01", code);
+			sprintf(data, "%s%02d%s", result, type, code);
 		}
 		sendReport(position_report, data);
 		clrStruct();
@@ -89,10 +112,16 @@ int reportPosition(char* code)
 	return 0;
 }
 
-int reportLockState(void)
+int reportLockState(char* code)
 {
-	char data[3] = { 0 };
-	sprintf(data, "%02x", getLockStatus());
+	char data[30] = { 0 };
+	if(strcmp(code, "0000")){
+		char codeHex[20] = { 0 };
+		charToHex(code, codeHex);
+		sprintf(data, "%02x%s", lockStatus, codeHex);
+	} else {
+		sprintf(data, "%02x%s", lockStatus, code);
+	}
 	sendReport(lockState_report, data);
 	return 0;
 }
@@ -100,6 +129,7 @@ int reportLockState(void)
 int reportDeviceState(void)
 {
 	char data[13] = { 0 };
+	battery = Get_battery();
 	sprintf(data, "%02x%04x%04x", battery, stateInterval, positionInterval);
 	sendReport(device_state_report, data);
 	return 0;
@@ -113,7 +143,7 @@ int reportHeartbeat(void)
 
 void runGetPosition(void)
 {
-	int r = reportPosition("0000");
+	int r = reportPosition("0000", 1);
 	if(r){
 		sendResponse(GET_POSITION_RES, instruc_data.mid, SUCCESS_CODE, (char*)SUCCESS_STATUS);
 	} else {
@@ -126,26 +156,19 @@ void runUnlock(void)
 {
 	int index = 10;
 	char data[10] = { 0 };
-	while(index > 0 && !isUnLock){
+	while(index > 0 && !wakeLock){
 		delay_ms(1000);
 		index--;
 	}
-	if(isUnLock){
-		toggleLockStatus();
-		char uid[5] = {0};
-		char codeHex[20] = { 0 };
-		rand4UUID(uid);
-		charToHex(uid, codeHex);
-		sprintf(data, "%s%s", SUCCESS_STATUS, codeHex);
-		sendResponse(UN_LOCK_RES, instruc_data.mid, SUCCESS_CODE, data);
-		reportPosition(codeHex);
+	if(wakeLock){
+		wakeLock = 0;
+		unLockControl();
+		sendResponse(UN_LOCK_RES, instruc_data.mid, SUCCESS_CODE, SUCCESS_STATUS);
 	} else {
 		sprintf(data, "%s%s", FAIL_STATUS, "0000");
 		
 		sendResponse(UN_LOCK_RES, instruc_data.mid, FAIL_CODE, data);
 	}
-	isUnLock = 0;
-	LED_OFF;
 	clrInstruc();
 }
 
@@ -252,12 +275,30 @@ void executionInstructions(void)
 
 void getTimeState(void){
 	if(isTim2){
-		reportPosition("0000");
+		reportPosition("0000", 0);
 		isTim2 = 0;
 	}
 	if(isTim3){
 		reportDeviceState();
 		isTim3 = 0;
+	}
+	if(isUnLock){
+		char uid[5] = {0};
+		char codeHex[20] = { 0 };
+		rand4UUID(uid);
+		charToHex(uid, codeHex);
+		reportLockState(codeHex);
+		reportPosition(codeHex, lockStatus + 2);
+		isUnLock = 0;
+	}
+}
+void EmergencyUnlock(void)
+{
+	char* data = pull_data_from_queue();
+	if(data != NULL && strcmp(data,"UNLOCK=s9f2"))
+	{
+		unLockControl();
+		printf("OK\r\n");
 	}
 }
 

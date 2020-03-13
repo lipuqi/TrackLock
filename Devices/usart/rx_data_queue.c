@@ -196,7 +196,7 @@ void rx_queue_init(void)
         /*初始化队列缓冲指针，指向实际的内存*/
         rx_queue.elems[i] = &node_data[i];
         
-        DATA_QUEUE_LOG("node_data[i].head=0x%x,\r\nrx_queue.elems[i] =0x%x", (uint32_t)node_data[i].head,(uint32_t)rx_queue.elems[i]->head);
+       // DATA_QUEUE_LOG("node_data[i].head=0x%x,\r\nrx_queue.elems[i] =0x%x", (uint32_t)node_data[i].head,(uint32_t)rx_queue.elems[i]->head);
 
         memset(node_data[i].head, 0, QUEUE_NODE_DATA_LEN);
     }
@@ -207,7 +207,7 @@ void rx_queue_init(void)
 
 
 /**
-  * @brief  往队列中写入数据的样例
+  * @brief  往队列中写入数据
   */
 void push_data_to_queue(char *src_dat,uint16_t src_len)
 {
@@ -224,7 +224,7 @@ void push_data_to_queue(char *src_dat,uint16_t src_len)
 			//往缓冲区写入数据，如使用串口接收、dma写入等方式
 			*(data_p->head + i) = src_dat[i];
 				data_p->len++;
-			printf("\r\ndata_p->len =%d",data_p->len);
+			//printf("\r\ndata_p->len =%d",data_p->len);
 		}else return;	
 		
 		cbPrint(rx_queue);	
@@ -239,10 +239,11 @@ void push_data_to_queue(char *src_dat,uint16_t src_len)
 
 
 /**
-  * @brief  从队列中取数据的样例
+  * @brief  从队列中取数据
   */
-void pull_data_from_queue(void)
+char* pull_data_from_queue(void)
 {
+	char* res;
 	QUEUE_DATA_TYPE *rx_data;	
 		
 	/*从缓冲区读取数据，进行处理，*/
@@ -253,12 +254,15 @@ void pull_data_from_queue(void)
 		//加上字符串结束符，方便直接输出字符串
 		*(rx_data->head+rx_data->len) = '\0';
 		
-		QUEUE_DEBUG("接收到的数据：%s",rx_data->head);
-		QUEUE_DEBUG_ARRAY((uint8_t*)rx_data->head,rx_data->len);
+		strcpy(res, rx_data->head);
+		//QUEUE_DEBUG("接收到的数据：%s",rx_data->head);
+		//QUEUE_DEBUG_ARRAY((uint8_t*)rx_data->head,rx_data->len);
 
 		//使用完数据必须调用cbReadFinish更新读指针
 		cbReadFinish(&rx_queue);
+		return res;
 	}
+	return NULL;
 }
 
 

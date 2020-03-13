@@ -5,6 +5,7 @@ int main(void)
 {	
 	NVIC_Configuration();
 	delay_init();
+	Adc_Init();
 	
 	taskScheduler_init();
 	Lock_Cfg();

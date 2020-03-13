@@ -136,26 +136,32 @@ void SysTick_Handler(void)
 {
 }
 
-char isUnLock;
+char wakeLock;
 void KEY1_EXIT_IRQHANDLER(void)
 {
 	 if(EXTI_GetITStatus(KEY1_EXIT_LINE) != RESET){
-		 if(!isUnLock){
-		 	reportLockState();
+		 if(!wakeLock){
+		 	reportHeartbeat();
 			TIM_Cmd(TIM4, ENABLE); 
-			isUnLock = 1;
-			LED_ON;
+			wakeLock = 1;
 		 }
 	 }
 	 EXTI_ClearITPendingBit(KEY1_EXIT_LINE);
 }
 
-void KEY2_EXIT_IRQHANDLER(void)
+char lockStatus;
+char isUnLock;
+void LOCK_EXIT_IRQHANDLER(void)
 {
-	if(EXTI_GetITStatus(KEY2_EXIT_LINE) != RESET){
-
+	 if(EXTI_GetITStatus(LOCK_EXIT_LINE) != RESET){
+			
+			uint8_t lock = LOCK_STA;
+			if(lock != lockStatus){
+				lockStatus = lock;
+				isUnLock = 1;
+			}
 	 }
-	EXTI_ClearITPendingBit(KEY2_EXIT_LINE);
+	 EXTI_ClearITPendingBit(LOCK_EXIT_LINE);
 }
 
 // 串口中断服务函数
@@ -236,17 +242,17 @@ void TIM4_IRQHandler(void)
     
     if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
     {   
+			if(wakeLock){
 				if(time4 > 20){
-					if(isUnLock){
-						isUnLock = 0;
-						LED_OFF;
-					}
-					time4 = 0;
-					TIM_Cmd(TIM4, DISABLE); 
+					wakeLock = 0;
 				} else {
 					time4++;
 				}
-				
+				showBattery();	
+			} else {
+				time4 = 0;
+				TIM_Cmd(TIM4, DISABLE); 
+			}
     }
     TIM_ClearITPendingBit(TIM4, TIM_FLAG_Update);
 }

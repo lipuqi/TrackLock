@@ -86,7 +86,7 @@ int cbIsFull(QueueBuffer *cb) ;
 int cbIsEmpty(QueueBuffer *cb) ;
 
 void rx_queue_init(void);
-void pull_data_from_queue(void);
+char* pull_data_from_queue(void);
 void push_data_to_queue(char *src_dat,uint16_t src_len);
 
 
