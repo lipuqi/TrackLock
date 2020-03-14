@@ -27,18 +27,18 @@
 
 #define LOCK_EXIT_GPIO_CLK			 		RCC_APB2Periph_GPIOA
 #define LOCK_EXIT_GPIO_PORT			 		GPIOA
-#define LOCK_EXIT_GPIO_PIN			 		GPIO_Pin_1
+#define LOCK_EXIT_GPIO_PIN			 		GPIO_Pin_4
 #define LOCK_EXIT_GPIO_PORTSOURCE	  GPIO_PortSourceGPIOA
-#define LOCK_EXIT_GPIO_PINSOURCE	  GPIO_PinSource1
-#define LOCK_EXIT_LINE						  EXTI_Line1
-#define LOCK_EXIT_IRQN							EXTI1_IRQn
-#define LOCK_EXIT_IRQHANDLER				EXTI1_IRQHandler
+#define LOCK_EXIT_GPIO_PINSOURCE	  GPIO_PinSource4
+#define LOCK_EXIT_LINE						  EXTI_Line4
+#define LOCK_EXIT_IRQN							EXTI4_IRQn
+#define LOCK_EXIT_IRQHANDLER				EXTI4_IRQHandler
 
 #define LOCK_STA GPIO_ReadInputDataBit(LOCK_EXIT_GPIO_PORT, LOCK_EXIT_GPIO_PIN)
 
-#define LOCK_OUT_GPIO_CLK			 		RCC_APB2Periph_GPIOC
-#define LOCK_OUT_GPIO_PORT			 	GPIOC
-#define LOCK_OUT_GPIO_PIN			 		GPIO_Pin_1
+#define LOCK_OUT_GPIO_CLK			 		RCC_APB2Periph_GPIOA
+#define LOCK_OUT_GPIO_PORT			 	GPIOA
+#define LOCK_OUT_GPIO_PIN			 		GPIO_Pin_5
 
 void Lock_Cfg(void);
 void unLockControl(void);

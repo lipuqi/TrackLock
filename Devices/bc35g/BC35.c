@@ -107,12 +107,6 @@ void BC35_COAPdata(char *data)
 		sprintf(res, "%s%d%s%s%s", "AT+NMGS=",getStrlen(data) / 2, ",", data, "\r\n");
 		
     Usart3_SendString(res);//提交数据到平台端
-    delay_ms(300);  
-    while(strx==NULL)
-    {
-        strx=strstr((const char*)RxBuffer,(const char*)"OK");//返回OK 
-    }
-    Clear_Buffer(); 
 }
 
 void BC35_Shutdown(void)

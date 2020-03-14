@@ -420,11 +420,6 @@
           <GroupName>Devices</GroupName>
           <Files>
             <File>
-              <FileName>bsp_led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Devices\led\bsp_led.c</FilePath>
-            </File>
-            <File>
               <FileName>key1.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Devices\key\key1.c</FilePath>

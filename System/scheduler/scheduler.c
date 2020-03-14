@@ -3,6 +3,7 @@
 InstrucData instruc_data;
 _SaveData Save_Data;
 extern SqQueue struc_queue;
+SqQueue send_msg_queue;
 extern char wakeLock;
 char battery;
 extern char lockStatus;
@@ -64,25 +65,24 @@ void taskScheduler_init(void)
 	isTim2 = 0;
 	isTim3 = 0;
 	wakeLock = 0;
-	lockStatus = 1;
-	isUnLock = 0;
-	battery = Get_battery();;
+	battery = Get_battery();
 	clrInstruc();
 	InitQueue(&struc_queue);
+	InitQueue(&send_msg_queue);
 }
 
 void sendReport(int msgId, char* data)
 {
 	char res[100] = { 0 };
 	sprintf(res, "%02x%s", msgId, data);
-	BC35_COAPdata(res);
+	EnQueue(&send_msg_queue, res);
 }
 
 void sendResponse(int msgId, char* mid, int errCode, char* data)
 {
 	char res[50] = { 0 };
 	sprintf(res, "%02x%s%02x%s", msgId, mid, errCode, data);
-	BC35_COAPdata(res);
+	EnQueue(&send_msg_queue, res);
 }
 
 int reportPosition(char* code, char type)
@@ -94,7 +94,7 @@ int reportPosition(char* code, char type)
 		char result[100] = { 0 };
 		char data[100] = { 0 };
 		
-		sprintf(gpsInfo, "%s%s%s", Save_Data.longitude, Save_Data.latitude, Save_Data.UTCTime);
+		sprintf(gpsInfo, "%011s%010s%010s", Save_Data.longitude, Save_Data.latitude, Save_Data.UTCTime);
 		charToHex(gpsInfo, result);
 		
 		if(strcmp(code, "0000")){
@@ -154,20 +154,12 @@ void runGetPosition(void)
 
 void runUnlock(void)
 {
-	int index = 10;
-	char data[10] = { 0 };
-	while(index > 0 && !wakeLock){
-		delay_ms(1000);
-		index--;
-	}
 	if(wakeLock){
 		wakeLock = 0;
 		unLockControl();
-		sendResponse(UN_LOCK_RES, instruc_data.mid, SUCCESS_CODE, SUCCESS_STATUS);
+		sendResponse(UN_LOCK_RES, instruc_data.mid, SUCCESS_CODE, (char*)SUCCESS_STATUS);
 	} else {
-		sprintf(data, "%s%s", FAIL_STATUS, "0000");
-		
-		sendResponse(UN_LOCK_RES, instruc_data.mid, FAIL_CODE, data);
+		sendResponse(UN_LOCK_RES, instruc_data.mid, FAIL_CODE, (char*)FAIL_STATUS);
 	}
 	clrInstruc();
 }
@@ -231,6 +223,16 @@ void getInstructions(void)
 	}
 }
 
+// 发送
+void sendMsg(void)
+{
+	char ais[msg_Buffer_Length];
+	while(DeQueue(&send_msg_queue, ais)){
+		BC35_COAPdata(ais);
+		delay_ms(10);
+	}	
+}
+
 // 解析单元
 void parseInstructions(void)
 {
@@ -274,6 +276,16 @@ void executionInstructions(void)
 }
 
 void getTimeState(void){
+	if(isUnLock){
+		isUnLock = 0;
+		char uid[5] = {0};
+		char codeHex[20] = { 0 };
+		rand4UUID(uid);
+		charToHex(uid, codeHex);
+		reportLockState(codeHex);
+		reportPosition(codeHex, lockStatus + 2);
+
+	}
 	if(isTim2){
 		reportPosition("0000", 0);
 		isTim2 = 0;
@@ -282,17 +294,8 @@ void getTimeState(void){
 		reportDeviceState();
 		isTim3 = 0;
 	}
-	if(isUnLock){
-		char uid[5] = {0};
-		char codeHex[20] = { 0 };
-		rand4UUID(uid);
-		charToHex(uid, codeHex);
-		reportLockState(codeHex);
-		reportPosition(codeHex, lockStatus + 2);
-		isUnLock = 0;
-	}
 }
-void EmergencyUnlock(void)
+void emergencyUnlock(void)
 {
 	char* data = pull_data_from_queue();
 	if(data != NULL && strcmp(data,"UNLOCK=s9f2"))
@@ -305,8 +308,10 @@ void EmergencyUnlock(void)
 
 void taskScheduler(void)
 {
+	getTimeState();
 	getInstructions();
 	parseInstructions();
 	executionInstructions();
-	getTimeState();
+	sendMsg();
+	//emergencyUnlock();
 }

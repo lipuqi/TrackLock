@@ -5,13 +5,13 @@ int main(void)
 {	
 	NVIC_Configuration();
 	delay_init();
+	USART_Config();
+	rx_queue_init();
+	
 	Adc_Init();
 	
 	taskScheduler_init();
-	Lock_Cfg();
-	Key_Cfg();
 	
-	USART_Config();
 	USART2_Config();
 	USART3_Config();
 	
@@ -19,9 +19,10 @@ int main(void)
 	TIM3_Int_Init();
 	TIM4_Int_Init();
 	
-	rx_queue_init();
-	
 	BC35_Init();
+	
+	Lock_Cfg();
+	Key_Cfg();
 	
 	printf("Welcome to use!\r\n");
 	

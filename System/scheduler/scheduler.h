@@ -8,6 +8,7 @@
 
 //定义数组长度
 #define instruc_Buffer_Length 	30
+#define msg_Buffer_Length 	    100
 #define messgaeId_Length    		3
 #define mid_Length          		5
 #define data_Length         		20
@@ -46,6 +47,7 @@ typedef struct Instructions
 	char isNull;
 } InstrucData;
 
+void sendResponse(int msgId, char* mid, int errCode, char* data);
 u16 getHeartbeatInterval(void);
 u16 getStateInterval(void);
 u16 getPositionInterval(void);

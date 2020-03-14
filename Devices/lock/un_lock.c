@@ -62,7 +62,7 @@ void unLockControl(void)
 {
 	BELL_ON;
 	LED_ctrl(BLUE,1);
-	delay_ms(2000);
+	delay_ms(1000);
 	BELL_OFF;
 	LED_ctrl(BLUE,0);
 }

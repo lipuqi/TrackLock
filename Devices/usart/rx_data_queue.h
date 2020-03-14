@@ -43,8 +43,8 @@ extern QueueBuffer rx_queue;
 
 
 /*信息输出*/
-#define QUEUE_DEBUG_ON         1
-#define QUEUE_DEBUG_ARRAY_ON		1
+#define QUEUE_DEBUG_ON         0
+#define QUEUE_DEBUG_ARRAY_ON		0
 
 #define QUEUE_INFO(fmt,arg...)           printf("<<-QUEUE-INFO->> "fmt"\n",##arg)
 #define QUEUE_ERROR(fmt,arg...)          printf("<<-QUEUE-ERROR->> "fmt"\n",##arg)

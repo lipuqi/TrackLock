@@ -136,14 +136,14 @@ void SysTick_Handler(void)
 {
 }
 
-char wakeLock;
+char wakeLock = 0;
 void KEY1_EXIT_IRQHANDLER(void)
 {
 	 if(EXTI_GetITStatus(KEY1_EXIT_LINE) != RESET){
 		 if(!wakeLock){
 		 	reportHeartbeat();
-			TIM_Cmd(TIM4, ENABLE); 
 			wakeLock = 1;
+			TIM_Cmd(TIM4, ENABLE); 
 		 }
 	 }
 	 EXTI_ClearITPendingBit(KEY1_EXIT_LINE);
@@ -155,12 +155,17 @@ void LOCK_EXIT_IRQHANDLER(void)
 {
 	 if(EXTI_GetITStatus(LOCK_EXIT_LINE) != RESET){
 			
-			uint8_t lock = LOCK_STA;
-			if(lock != lockStatus){
-				lockStatus = lock;
-				isUnLock = 1;
-			}
+		 if(LOCK_STA != lockStatus){
+				delay_ms(10);
+			 if(LOCK_STA != lockStatus){
+				if(!isUnLock){
+					lockStatus = LOCK_STA;
+					isUnLock = 1;
+				 }
+			 }
+		 }
 	 }
+	 delay_ms(100);
 	 EXTI_ClearITPendingBit(LOCK_EXIT_LINE);
 }
 
