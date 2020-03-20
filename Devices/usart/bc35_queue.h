@@ -8,7 +8,7 @@
 /*循环队列对的顺序存储结构*/
 typedef struct
 {
-	char ais_data[MAXSIZE][30];  //队列中的二维数组元素 
+	char ais_data[MAXSIZE][100];  //队列中的二维数组元素 
 	int front;    //头指针
 	int rear;    //尾指针
 }SqQueue;

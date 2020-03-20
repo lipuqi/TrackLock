@@ -26,7 +26,7 @@ void NVIC4_config(void)
 	 nvic.NVIC_IRQChannel=TIM4_IRQn;
 	 nvic.NVIC_IRQChannelCmd=ENABLE;
 	 nvic.NVIC_IRQChannelPreemptionPriority=0;
-	 nvic.NVIC_IRQChannelSubPriority=2;
+	 nvic.NVIC_IRQChannelSubPriority=3;
 	 NVIC_Init(&nvic);
 }
  
@@ -82,7 +82,7 @@ void TIM4_Int_Init(void)
     
     TIM_DeInit(TIM4);
     
-    TIM_TimeBaseStructure.TIM_Period = 1000 - 1;
+    TIM_TimeBaseStructure.TIM_Period = 3000 - 1;
     TIM_TimeBaseStructure.TIM_Prescaler = 36000 - 1;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;

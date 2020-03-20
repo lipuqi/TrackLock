@@ -8,6 +8,8 @@ int main(void)
 	USART_Config();
 	rx_queue_init();
 	
+	printf("main -> start");
+	
 	Adc_Init();
 	
 	taskScheduler_init();
@@ -24,6 +26,7 @@ int main(void)
 	Lock_Cfg();
 	Key_Cfg();
 	
+	IWDG_Init(4,3125); //5s
 	printf("Welcome to use!\r\n");
 	
 	while (1){

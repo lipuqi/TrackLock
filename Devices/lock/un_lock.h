@@ -25,23 +25,25 @@
 #define BELL_OFF     			  GPIO_ResetBits(BELL_GPIO_PORT, BELL_GPIO_PIN)
 #define BELL_TOGGLE  			  BELL_GPIO_PORT -> ODR ^= BELL_GPIO_PIN
 
-#define LOCK_EXIT_GPIO_CLK			 		RCC_APB2Periph_GPIOA
-#define LOCK_EXIT_GPIO_PORT			 		GPIOA
-#define LOCK_EXIT_GPIO_PIN			 		GPIO_Pin_4
-#define LOCK_EXIT_GPIO_PORTSOURCE	  GPIO_PortSourceGPIOA
-#define LOCK_EXIT_GPIO_PINSOURCE	  GPIO_PinSource4
-#define LOCK_EXIT_LINE						  EXTI_Line4
-#define LOCK_EXIT_IRQN							EXTI4_IRQn
-#define LOCK_EXIT_IRQHANDLER				EXTI4_IRQHandler
+#define LOCK_EXIT_GPIO_CLK			 		RCC_APB2Periph_GPIOB
+#define LOCK_EXIT_GPIO_PORT			 		GPIOB
+#define LOCK_EXIT_GPIO_PIN			 		GPIO_Pin_3
+#define LOCK_EXIT_GPIO_PORTSOURCE	  GPIO_PortSourceGPIOB
+#define LOCK_EXIT_GPIO_PINSOURCE	  GPIO_PinSource3
+#define LOCK_EXIT_LINE						  EXTI_Line3
+#define LOCK_EXIT_IRQN							EXTI3_IRQn
+#define LOCK_EXIT_IRQHANDLER				EXTI3_IRQHandler
 
 #define LOCK_STA GPIO_ReadInputDataBit(LOCK_EXIT_GPIO_PORT, LOCK_EXIT_GPIO_PIN)
 
-#define LOCK_OUT_GPIO_CLK			 		RCC_APB2Periph_GPIOA
-#define LOCK_OUT_GPIO_PORT			 	GPIOA
-#define LOCK_OUT_GPIO_PIN			 		GPIO_Pin_5
+#define LOCK_OUT_GPIO_CLK			 		RCC_APB2Periph_GPIOB
+#define LOCK_OUT_GPIO_PORT			 	GPIOB
+#define LOCK_OUT_GPIO_PIN			 		GPIO_Pin_4
 
 void Lock_Cfg(void);
 void unLockControl(void);
 void LED_ctrl(u8 colour, char state);
+void enableToRising(void);
+void enableToFalling(void);
 
 #endif

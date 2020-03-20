@@ -75,6 +75,7 @@ char Get_battery(void)
 	char b;
 	adcx=Get_Adc_Average(10);
 	temp=(float)adcx*11*(3.3/4096);
+	printf("Get_battery -> %f", temp);
 	if (temp > 4.0)
 	{
 		b = 100;

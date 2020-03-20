@@ -74,9 +74,9 @@
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
           </BeforeMake>
           <AfterMake>
-            <RunUserProg1>0</RunUserProg1>
+            <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name></UserProg1Name>
+            <UserProg1Name>D:\Keil_v5\ARM\ARMCC\bin\fromelf.exe --bin -o ../Output/test.bin ../Output/test.axf</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -464,6 +464,26 @@
               <FileType>1</FileType>
               <FilePath>..\Devices\lock\un_lock.c</FilePath>
             </File>
+            <File>
+              <FileName>spi_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Devices\flash\spi_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi_flash.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Devices\flash\spi_flash.h</FilePath>
+            </File>
+            <File>
+              <FileName>flash_memory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Devices\flash\flash_memory.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash_memory.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\Devices\flash\flash_memory.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -635,9 +655,19 @@
               <FilePath>..\System\ADC\adc.c</FilePath>
             </File>
             <File>
-              <FileName>adc.h</FileName>
+              <FileName>iwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\System\IWDG\iwdg.c</FilePath>
+            </File>
+            <File>
+              <FileName>ruleSelector.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\System\utils\ruleSelector.c</FilePath>
+            </File>
+            <File>
+              <FileName>ruleSelector.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\System\ADC\adc.h</FilePath>
+              <FilePath>..\System\utils\ruleSelector.h</FilePath>
             </File>
           </Files>
         </Group>

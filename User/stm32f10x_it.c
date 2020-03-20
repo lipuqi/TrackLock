@@ -154,13 +154,17 @@ char isUnLock;
 void LOCK_EXIT_IRQHANDLER(void)
 {
 	 if(EXTI_GetITStatus(LOCK_EXIT_LINE) != RESET){
-			
 		 if(LOCK_STA != lockStatus){
 				delay_ms(10);
 			 if(LOCK_STA != lockStatus){
 				if(!isUnLock){
 					lockStatus = LOCK_STA;
 					isUnLock = 1;
+					if(lockStatus){
+						enableToFalling();
+					} else {
+						enableToRising();
+					}
 				 }
 			 }
 		 }
@@ -248,7 +252,7 @@ void TIM4_IRQHandler(void)
     if(TIM_GetITStatus(TIM4, TIM_IT_Update) != RESET)
     {   
 			if(wakeLock){
-				if(time4 > 20){
+				if(time4 > 10){
 					wakeLock = 0;
 				} else {
 					time4++;

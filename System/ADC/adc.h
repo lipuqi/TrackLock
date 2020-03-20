@@ -1,5 +1,6 @@
 #ifndef __ADC_H
 #define __ADC_H	
+#include <stdio.h>
 #include "../sys/sys.h"
 #include "../delay/delay.h"
 

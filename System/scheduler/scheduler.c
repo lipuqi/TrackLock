@@ -2,6 +2,7 @@
 
 InstrucData instruc_data;
 _SaveData Save_Data;
+extern DeviceStatus Device_Status;
 extern SqQueue struc_queue;
 SqQueue send_msg_queue;
 extern char wakeLock;
@@ -12,21 +13,18 @@ extern char isUnLock;
 extern char isTim2;
 extern char isTim3;
 
-u16 heartbeatInterval = 1000;
-u16 stateInterval = 3;
-u16 positionInterval = 2;
 
 u16 getHeartbeatInterval(void)
 {
-	return heartbeatInterval;
+	return Device_Status.heartbeatInterval;
 }
 u16 getStateInterval(void)
 {
-	return stateInterval;
+	return Device_Status.stateInterval;
 }
 u16 getPositionInterval(void)
 {
-	return positionInterval;
+	return Device_Status.positionInterval;
 }
 
 void showBattery(void)
@@ -66,6 +64,7 @@ void taskScheduler_init(void)
 	isTim3 = 0;
 	wakeLock = 0;
 	battery = Get_battery();
+	Device_Status = readConfig();
 	clrInstruc();
 	InitQueue(&struc_queue);
 	InitQueue(&send_msg_queue);
@@ -75,6 +74,7 @@ void sendReport(int msgId, char* data)
 {
 	char res[100] = { 0 };
 	sprintf(res, "%02x%s", msgId, data);
+	printf(">sendReport -> res:%s\r\n", res);
 	EnQueue(&send_msg_queue, res);
 }
 
@@ -82,29 +82,47 @@ void sendResponse(int msgId, char* mid, int errCode, char* data)
 {
 	char res[50] = { 0 };
 	sprintf(res, "%02x%s%02x%s", msgId, mid, errCode, data);
+	printf(">sendResponse -> res:%s\r\n", res);
 	EnQueue(&send_msg_queue, res);
 }
 
 int reportPosition(char* code, char type)
 {
 	getGpsBuffer(positionNum);
+	IWDG_Feed();
 	if (Save_Data.isUsefull)
 	{
-		char gpsInfo[50] = { 0 };
-		char result[100] = { 0 };
-		char data[100] = { 0 };
+		char gpsInfo[32] = { 0 };
+		char result[64] = { 0 };
+		char data[80] = { 0 };
 		
-		sprintf(gpsInfo, "%011s%010s%010s", Save_Data.longitude, Save_Data.latitude, Save_Data.UTCTime);
+		double lon_Onenet = longitudeToOnenetFormat(Save_Data.longitude);
+		double lat_Onenet = latitudeToOnenetFormat(Save_Data.latitude);
+		
+		sprintf(gpsInfo, "%0.7f%0.7f%010s", lon_Onenet, lat_Onenet, Save_Data.UTCTime);
 		charToHex(gpsInfo, result);
-		
 		if(strcmp(code, "0000")){
-			char codeHex[20] = { 0 };
+			char codeHex[9] = { 0 };
 			charToHex(code, codeHex);
 			sprintf(data, "%s%02d%s", result, type, codeHex);
 		} else {
 			sprintf(data, "%s%02d%s", result, type, code);
 		}
-		sendReport(position_report, data);
+		
+		if(type > 0 ){
+			sendReport(position_report, data);
+		} else {
+			if(isCommunication()){
+				onlineRule(battery, lat_Onenet, lon_Onenet);
+				sendReport(position_report, data);
+				readOfflineData();
+			} else {
+				offlineRule(lat_Onenet, lon_Onenet);
+				char res[100] = { 0 };
+				sprintf(res, "%02x%s", position_report, data);
+				writeOfflineData(res, strlen(res));
+			}
+		}
 		clrStruct();
 		return 1;
 	}
@@ -130,7 +148,7 @@ int reportDeviceState(void)
 {
 	char data[13] = { 0 };
 	battery = Get_battery();
-	sprintf(data, "%02x%04x%04x", battery, stateInterval, positionInterval);
+	sprintf(data, "%02x%04x%04x", battery, Device_Status.stateInterval, Device_Status.positionInterval);
 	sendReport(device_state_report, data);
 	return 0;
 }
@@ -154,6 +172,7 @@ void runGetPosition(void)
 
 void runUnlock(void)
 {
+	printf("runUnlock -> wakeLock:%d\r\n", wakeLock);
 	if(wakeLock){
 		wakeLock = 0;
 		unLockControl();
@@ -182,15 +201,15 @@ void runSetStateInterval(void)
 	switch(stateType)
 		{
 			case 0:
-				heartbeatInterval = interval;
+				Device_Status.heartbeatInterval = interval;
 				sendResponse(SET_STATE_INTERVAL_RES, instruc_data.mid, SUCCESS_CODE, (char*)SUCCESS_STATUS);
 				break;
 			case 1:
-				stateInterval = interval;
+				Device_Status.stateInterval = interval;
 				sendResponse(SET_STATE_INTERVAL_RES, instruc_data.mid, SUCCESS_CODE, (char*)SUCCESS_STATUS);
 				break;
 			case 2:
-				positionInterval = interval;
+				Device_Status.positionInterval = interval;
 				sendResponse(SET_STATE_INTERVAL_RES, instruc_data.mid, SUCCESS_CODE, (char*)SUCCESS_STATUS);
 				break;
 
@@ -198,6 +217,7 @@ void runSetStateInterval(void)
 			sendResponse(SET_STATE_INTERVAL_RES, instruc_data.mid, FAIL_CODE, (char*)FAIL_STATUS);	
 			break;
 		}
+	writeConfig(Device_Status);
 	clrInstruc();
 }
 
@@ -228,6 +248,7 @@ void sendMsg(void)
 {
 	char ais[msg_Buffer_Length];
 	while(DeQueue(&send_msg_queue, ais)){
+		printf("sendMsg -> ais:%s\r\n", ais);
 		BC35_COAPdata(ais);
 		delay_ms(10);
 	}	
@@ -251,6 +272,7 @@ void executionInstructions(void)
 	if(instruc_data.isParseData){
 		instruc_data.isParseData = false;
 		int msgId = charhex_to_dec(instruc_data.messgaeId); 
+		printf("executionInstructions -> msgId:%d\r\n", msgId);
 		switch(msgId)
 		{
 			case UN_LOCK_REQ:
@@ -308,6 +330,7 @@ void emergencyUnlock(void)
 
 void taskScheduler(void)
 {
+	IWDG_Feed();
 	getTimeState();
 	getInstructions();
 	parseInstructions();

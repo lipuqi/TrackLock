@@ -32,12 +32,12 @@ void Lock_Cfg(void){
 	GPIO_Init(LEDRGB_GPIO_PORT, &lock_gpio);
 	
 	lock_gpio.GPIO_Pin = LOCK_EXIT_GPIO_PIN;
-	lock_gpio.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	lock_gpio.GPIO_Mode = GPIO_Mode_IPD;
 	GPIO_Init(LOCK_EXIT_GPIO_PORT, &lock_gpio);
 	
 	lock_gpio.GPIO_Pin = LOCK_OUT_GPIO_PIN;    
 	lock_gpio.GPIO_Mode = GPIO_Mode_Out_PP;       
-	lock_gpio.GPIO_Speed = GPIO_Speed_50MHz;
+	lock_gpio.GPIO_Speed = GPIO_Speed_2MHz;
 	GPIO_Init(LOCK_OUT_GPIO_PORT, &lock_gpio);
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO , ENABLE);
@@ -56,6 +56,22 @@ void Lock_Cfg(void){
 	GPIO_SetBits(LEDRGB_GPIO_PORT, LEDR_GPIO_PIN);
 	GPIO_SetBits(LEDRGB_GPIO_PORT, LEDG_GPIO_PIN);
 	GPIO_SetBits(LEDRGB_GPIO_PORT, LEDB_GPIO_PIN);
+}
+
+void enableToRising(void)
+{
+    EXTI->RTSR &= ~LOCK_EXIT_LINE;
+    EXTI->FTSR &= ~LOCK_EXIT_LINE;
+	
+	  EXTI->RTSR |= LOCK_EXIT_LINE;
+}
+
+void enableToFalling(void)
+{
+    EXTI->RTSR &= ~LOCK_EXIT_LINE;
+    EXTI->FTSR &= ~LOCK_EXIT_LINE;
+	
+	  EXTI->FTSR |= LOCK_EXIT_LINE;
 }
 
 void unLockControl(void)

@@ -164,3 +164,100 @@ void rand4UUID(char des[5])
 	}
 }
 
+/**
+ * \brief Convert string to number
+ */
+int util_atoi(const char *str, int str_sz, int radix)
+{
+    char *tmp_ptr;
+    char buff[NMEA_CONVSTR_BUF];
+    int res = 0;
+
+    if(str_sz < NMEA_CONVSTR_BUF)
+    {
+        memcpy(&buff[0], str, str_sz);
+        buff[str_sz] = '\0';
+        res = strtol(&buff[0], &tmp_ptr, radix);
+    }
+
+    return res;
+}
+
+/**
+ * \brief Convert string to fraction number
+ */
+double util_atof(const char *str, int str_sz)
+{
+    char *tmp_ptr;
+    char buff[NMEA_CONVSTR_BUF];
+    double res = 0;
+
+    if(str_sz < NMEA_CONVSTR_BUF)
+    {
+        memcpy(&buff[0], str, str_sz);
+        buff[str_sz] = '\0';
+        res = strtod(&buff[0], &tmp_ptr);
+    }
+
+    return res;
+}
+
+// 求弧度
+double radian(double d)
+{
+	return d * PI / 180.0;   //角度1? = π / 180
+}
+
+//计算距离
+double get_distance(double lat1, double lng1, double lat2, double lng2)
+{
+	double radLat1 = radian(lat1);
+	double radLat2 = radian(lat2);
+	double a = radLat1 - radLat2;
+	double b = radian(lng1) - radian(lng2);
+	double dst = 2 * asin((sqrt(pow(sin(a / 2), 2) + cos(radLat1) * cos(radLat2) * pow(sin(b / 2), 2))));
+	dst = dst * EARTH_RADIUS;
+	dst = round(dst * 10000) / 10;
+	return dst;
+}
+
+double longitudeToOnenetFormat(char* lon_str)
+{
+	double lon_temp = 0;
+	long lon_Onenet = 0;
+	int dd_int = 0;
+	long mm_int = 0;
+	double lon_Onenet_double = 0;
+
+	lon_temp = atof(lon_str);
+	lon_Onenet = lon_temp * 100000;  //转换为整数
+
+	dd_int = lon_Onenet / 10000000; //取出dd
+
+	mm_int = lon_Onenet % 10000000;  //取出MM部分
+
+
+	lon_Onenet_double = dd_int + (double)mm_int / 60 / 100000;//换算为Onenet格式
+	return  lon_Onenet_double;
+}
+
+double latitudeToOnenetFormat(char* lat_str)
+{
+	double lat_temp = 0;
+	long lat_Onenet = 0;
+	int dd_int = 0;
+	long mm_int = 0;
+
+	double lat_Onenet_double = 0;
+
+	lat_temp = atof(lat_str);
+	lat_Onenet = lat_temp * 100000;  //转换为整数
+
+	dd_int = lat_Onenet / 10000000; //取出dd
+
+	mm_int = lat_Onenet % 10000000;  //取出MM部分
+
+	lat_Onenet_double = dd_int + (double)mm_int / 60 / 100000;//换算为Onenet格式
+	return  lat_Onenet_double;
+}
+
