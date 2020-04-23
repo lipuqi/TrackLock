@@ -68,7 +68,6 @@ void USART_Config(void)
 	// 使能串口
 	USART_Cmd(DEBUG_USARTx, ENABLE);
 	
-	
 }
 
 /*****************  发送一个字节 **********************/

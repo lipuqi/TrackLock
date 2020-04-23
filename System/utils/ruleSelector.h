@@ -17,10 +17,8 @@
 #define batteryMinDistanceNum   (10)
 #define batteryMinRule          (5)
 #define batteryMinDistanceRule  (10)
-  
-#define longitude_Onenet        (116.403694)
-#define latitude_Onenet         (39.913164)
 
+void ruleInit(void);
 void onlineRule(char battery, double lat_Onenet, double lon_Onenet);
 void offlineRule(double lat_Onenet, double lon_Onenet);
 

@@ -65,6 +65,7 @@ void taskScheduler_init(void)
 	wakeLock = 0;
 	battery = Get_battery();
 	Device_Status = readConfig();
+	ruleInit();
 	clrInstruc();
 	InitQueue(&struc_queue);
 	InitQueue(&send_msg_queue);

@@ -8,9 +8,10 @@ int main(void)
 	USART_Config();
 	rx_queue_init();
 	
-	printf("main -> start");
-	
+	Lock_Cfg();
+	initLed();
 	Adc_Init();
+	Flash_Init();
 	
 	taskScheduler_init();
 	
@@ -21,12 +22,15 @@ int main(void)
 	TIM3_Int_Init();
 	TIM4_Int_Init();
 	
-	BC35_Init();
-	
-	Lock_Cfg();
 	Key_Cfg();
 	
 	IWDG_Init(4,3125); //5s
+
+	while(!BC35_Init()){
+		malfunctionLed();
+		BC35_Restart();
+	}
+
 	printf("Welcome to use!\r\n");
 	
 	while (1){

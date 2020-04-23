@@ -83,6 +83,20 @@ void unLockControl(void)
 	LED_ctrl(BLUE,0);
 }
 
+void initLed(void)
+{
+	LED_ctrl(WHITE,1);
+	delay_ms(1000);
+	LED_ctrl(WHITE,0);
+}
+
+void malfunctionLed(void)
+{
+	LED_ctrl(NAVY,1);
+	delay_ms(1000);
+	LED_ctrl(NAVY,0);
+}
+
 void LED_ctrl(u8 colour, char state)
 {
     switch(colour){

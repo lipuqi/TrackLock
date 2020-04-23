@@ -22,6 +22,14 @@ int Flash_Init(void)
 	/* Get SPI Flash ID */
 	FlashID = SPI_FLASH_ReadID();
 	
+//	SPI_FLASH_BulkErase();
+//	DeviceStatus device_Status;
+//	device_Status.heartbeatInterval = 10;
+//	device_Status.positionInterval = 2;
+//	device_Status.stateInterval = 5;
+//	writeConfig(device_Status);
+//	offlineLengthInit();
+	
 	clrFlashData();	
 	return FlashID == 0xEF4018;
 }

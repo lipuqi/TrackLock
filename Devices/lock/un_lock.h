@@ -42,6 +42,8 @@
 
 void Lock_Cfg(void);
 void unLockControl(void);
+void initLed(void);
+void malfunctionLed(void);
 void LED_ctrl(u8 colour, char state);
 void enableToRising(void);
 void enableToFalling(void);
